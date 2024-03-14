@@ -1,0 +1,13 @@
+fichierCSV = 'DataProjet2024.csv';
+donnees = readtable(fichierCSV, delimiter=";");
+HauteurChuteNette = str2double(donnees.NivAmont) - str2double(donnees.Elav);
+
+Q1 = str2double(donnees.Q1);
+P1 = str2double(donnees.P1);
+
+mdlTurbine1 = fitlm([HauteurChuteNette, Q1], P1);
+
+Q1 = str2double(donnees.Q2);
+P1 = str2double(donnees.P2);
+
+mdlTurbine1 = fitlm([HauteurChuteNette, Q1], P1);
