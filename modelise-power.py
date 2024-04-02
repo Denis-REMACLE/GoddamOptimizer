@@ -39,9 +39,9 @@ def calculer_hauteur_chute_nette(elevation_amont, elevation_avale, debit_turbine
     pertes = (0.5 * 10**(-5)) * debit_turbine**2
     return elevation_amont - elevation_avale - pertes
 
-def modele_puissance(x, a, b, c):
+def modele_puissance(x, a, b, c, d, e):
     debit_turbine, hauteur_chute_nette = x
-    return a + b * debit_turbine + c * hauteur_chute_nette
+    return a * (debit_turbine**2) + b * (hauteur_chute_nette**2) + c * hauteur_chute_nette + d * debit_turbine + e
 
 df = lire_donnees_depuis_csv(filepath)
 

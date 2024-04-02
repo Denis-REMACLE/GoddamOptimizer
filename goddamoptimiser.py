@@ -19,9 +19,13 @@ def modele_elevation_avale(debit_total):
     return a * debit_total**2 + b * debit_total + c
 
 def modele_puissance(debit_turbine, hauteur_chute_nette, i):
-    modele_turbine = [(-70.80245236, 0.2964904, 2.05368779) , (-81.82480884, 0.31602019, 2.35850046), (-84.32398346, 0.30235039, 2.44761475), (-79.47369741, 0.29829515, 2.3974557), (-87.10751694,   0.31836598,   2.52030515)]
-    a, b, c = modele_turbine[i]
-    return a + b * debit_turbine + c * hauteur_chute_nette
+    modele_turbine = [(-4.63382637e-04, -1.69195505e-01, 1.26899438e+01, 3.63335578e-01, -2.36531963e+02),
+                    (-2.75024556e-04, -1.79623689e-01, 1.37759472e+01, 3.53094268e-01, -2.61927181e+02),
+                    (-6.33871586e-04, -2.18730415e-01, 1.57293911e+01, 3.88788224e-01, -2.82334058e+02),
+                    (-5.25471618e-04, -2.44235045e-01, 1.81190162e+01, 4.08210465e-01, -3.36417000e+02),
+                    (-5.85633942e-04, -1.56392085e-01, 1.19691372e+01, 4.03504883e-01, -2.27110218e+02)]
+    a, b, c, d, e = modele_turbine[i]
+    return a * (debit_turbine**2) + b * (hauteur_chute_nette**2) + c * hauteur_chute_nette + d * debit_turbine + e
 
 def production_totale(x, debit_total_disponible, elevation_amont):
     elevation_avale = modele_elevation_avale(debit_total_disponible)
@@ -45,7 +49,7 @@ def optimize(elevation_amont, debit_total_disponible, bounds):
             hauteur_chute_nette = hauteur_chute_brute - (0.5 * 10**(-5)) * debit**2
             production = modele_puissance(debit, hauteur_chute_nette, i)
             production_turbine.append(production)
-        return np.round(optimized_debits, 2), production_turbine, sum(production_turbine)
+        return sum(production_turbine)
 
     else:
         print("L'optimisation n'a pas réussi.")
@@ -74,6 +78,7 @@ def main():
                 else:
                     bounds.append((0, 160))
             print(optimize(elevations[i], debits[i], bounds))
+            print(df['P1'][i]+df['P2'][i]+df['P3'][i]+df['P4'][i]+df['P5'][i])
 
 if __name__ == "__main__":
     main()
