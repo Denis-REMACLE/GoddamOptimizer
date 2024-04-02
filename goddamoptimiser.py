@@ -19,9 +19,9 @@ def modele_elevation_avale(debit_total):
     return a * debit_total**2 + b * debit_total + c
 
 def modele_puissance(debit_turbine, hauteur_chute_nette, i):
-    modele_turbine = [(0.00844367, 0.31262701) , (0.008863, 0.28795731), (0.00854668, 0.39207585), (0.0089237, 0.63343666), (0.0089318, 0.60632745)]
-    a, b = modele_turbine[i]
-    return a * debit_turbine * hauteur_chute_nette + b
+    modele_turbine = [(-70.80245236, 0.2964904, 2.05368779) , (-81.82480884, 0.31602019, 2.35850046), (-84.32398346, 0.30235039, 2.44761475), (-79.47369741, 0.29829515, 2.3974557), (-87.10751694,   0.31836598,   2.52030515)]
+    a, b, c = modele_turbine[i]
+    return a + b * debit_turbine + c * hauteur_chute_nette
 
 def production_totale(x, debit_total_disponible, elevation_amont):
     elevation_avale = modele_elevation_avale(debit_total_disponible)

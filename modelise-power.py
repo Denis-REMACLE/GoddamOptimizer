@@ -39,33 +39,28 @@ def calculer_hauteur_chute_nette(elevation_amont, elevation_avale, debit_turbine
     pertes = (0.5 * 10**(-5)) * debit_turbine**2
     return elevation_amont - elevation_avale - pertes
 
-def modele_puissance(x, a, b):
+def modele_puissance(x, a, b, c):
     debit_turbine, hauteur_chute_nette = x
-    return a * debit_turbine * hauteur_chute_nette + b
+    return a + b * debit_turbine + c * hauteur_chute_nette
 
 df = lire_donnees_depuis_csv(filepath)
 
 df['Hauteur_Chute_Nette1'] = calculer_hauteur_chute_nette(df['Niv Amont'], df['Elav'], df['Q1'])
 params, _ = curve_fit(modele_puissance, (df['Q1'], df['Hauteur_Chute_Nette1']), df['P1'])
 print("Paramètres du modèle pour la Turbine 1: ", params)
-tracer_modele_puissance(df['Q1'], df['Hauteur_Chute_Nette1'], df['P1'], params, titre='Puissance Produite par Turbine 1')
 
 df['Hauteur_Chute_Nette2'] = calculer_hauteur_chute_nette(df['Niv Amont'], df['Elav'], df['Q2'])
 params, _ = curve_fit(modele_puissance, (df['Q2'], df['Hauteur_Chute_Nette2']), df['P2'])
 print("Paramètres du modèle pour la Turbine 2: ", params)
-tracer_modele_puissance(df['Q2'], df['Hauteur_Chute_Nette2'], df['P2'], params, titre='Puissance Produite par Turbine 2')
 
 df['Hauteur_Chute_Nette3'] = calculer_hauteur_chute_nette(df['Niv Amont'], df['Elav'], df['Q3'])
 params, _ = curve_fit(modele_puissance, (df['Q3'], df['Hauteur_Chute_Nette3']), df['P3'])
 print("Paramètres du modèle pour la Turbine 3: ", params)
-tracer_modele_puissance(df['Q3'], df['Hauteur_Chute_Nette3'], df['P3'], params, titre='Puissance Produite par Turbine 3')
 
 df['Hauteur_Chute_Nette4'] = calculer_hauteur_chute_nette(df['Niv Amont'], df['Elav'], df['Q4'])
 params, _ = curve_fit(modele_puissance, (df['Q4'], df['Hauteur_Chute_Nette4']), df['P4'])
 print("Paramètres du modèle pour la Turbine 4: ", params)
-tracer_modele_puissance(df['Q4'], df['Hauteur_Chute_Nette4'], df['P4'], params, titre='Puissance Produite par Turbine 4')
 
 df['Hauteur_Chute_Nette5'] = calculer_hauteur_chute_nette(df['Niv Amont'], df['Elav'], df['Q5'])
 params, _ = curve_fit(modele_puissance, (df['Q5'], df['Hauteur_Chute_Nette5']), df['P5'])
 print("Paramètres du modèle pour la Turbine 5: ", params)
-tracer_modele_puissance(df['Q5'], df['Hauteur_Chute_Nette5'], df['P5'], params, titre='Puissance Produite par Turbine 5')
