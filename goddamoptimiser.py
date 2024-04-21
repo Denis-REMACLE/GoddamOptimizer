@@ -34,10 +34,10 @@ def production_totale(x, debit_total_disponible, elevation_amont):
     result = np.sum([modele_puissance(x[i], hauteur_chute_nette, i) for i in range(len(x))])
     return -result
 
-def optimize(elevation_amont, debit_total_disponible, bounds):
+def optimize(debit_total_disponible, elevation_amont,t1, t2, t3, t4, t5):
     contraintes = ({'type': 'ineq', 'fun': lambda x: debit_total_disponible - sum(x)})
-    x0 = [0] * len(bounds)
-
+    x0 = [t1, t2, t3, t4, t5]
+    bounds = [(0, t1),(0, t2),(0, t3),(0, t4),(0, t5)]
     result = minimize(production_totale, x0, args=(debit_total_disponible, elevation_amont), method='SLSQP', bounds=bounds, constraints=contraintes)
 
     if result.success:
@@ -53,32 +53,3 @@ def optimize(elevation_amont, debit_total_disponible, bounds):
 
     else:
         print("L'optimisation n'a pas réussi.")
-
-def main():
-    parser = argparse.ArgumentParser(
-        prog="GoddamOptimiser",
-        description="This script optimises dams",
-    )
-    parser.add_argument(
-        "-c",
-        "--csv",
-        type=str,
-        default=False,
-        help="Uses a csv to optimise multiple times",
-    )
-    args = parser.parse_args()
-    if args.csv:
-        df = lire_donnees_depuis_csv(args.csv)
-        elevations, debits = df['Niv Amont'].head(100), df['Qtot'].head(100)
-        for i in range(100):
-            bounds = []
-            for j in range(5):
-                if df["Q"+str(j+1)][i] == 0:
-                    bounds.append((0, 0))
-                else:
-                    bounds.append((0, 160))
-            print(optimize(elevations[i], debits[i], bounds))
-            print(df['P1'][i]+df['P2'][i]+df['P3'][i]+df['P4'][i]+df['P5'][i])
-
-if __name__ == "__main__":
-    main()
