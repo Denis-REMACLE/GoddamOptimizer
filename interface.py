@@ -1,5 +1,5 @@
 import tkinter as tk
-import GoddamOptimizer as GO
+import goddamoptimiser as GO
 import pynomadopti  as PNO
 
 window = tk.Tk()
