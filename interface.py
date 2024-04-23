@@ -3,33 +3,12 @@ from tkinter import filedialog
 import goddamoptimiser as GO
 import pynomadopti  as PNO
 
-window = tk.Tk()
+def show_frame(frame):
+    frame1.pack_forget()
+    frame2.pack_forget()
+    frame3.pack_forget()
+    frame.pack(fill='both', expand=True)
 
-def open_window(): #Programmation Dynamique
-    window = tk.Toplevel()
-    
-    window.attributes('-topmost', True)
-    label = tk.Label(window, text="Voici une nouvelle fenêtre!")
-    label2 = tk.Label(window, text=entry1.get())
-    label.pack(pady=20)
-    label2.pack()
-    window.bind('<Return>', lambda event: window.destroy())
-
-
-def open_window2(): #NOMAD
-    window = tk.Toplevel()
-    window.attributes('-topmost', True)
-    label = tk.Label(window, text="Voici une autre nouvelle fenêtre!")
-    label.pack(pady=20)
-    window.bind('<Return>', lambda event: window.destroy())
-
-
-def programmation_dynamique():
-    ...
-
-
-def nomad():
-    ...
 
 def afficher_valeurs():
     valeurs_turbines = [entrees_turbines[i].get() for i in range(5)]
@@ -41,7 +20,33 @@ def afficher_valeurs():
             entrees_turbines[i].insert(0, "160")   # Rétablit la valeur par défaut
     print("Valeurs des turbines:", valeurs_turbines)
     
-   
+    
+def page2():
+	programmation_dynamique_func()
+	for widget in frame2.winfo_children():
+		widget.destroy()
+	tk.Label(frame2, text="Ceci est la page 2").pack(pady=20)
+	btn_to_frame1_from_frame2 = tk.Button(frame2, text="Retourner à la page de calculs", command=lambda: show_frame(frame1))
+	btn_to_frame1_from_frame2.pack()
+	show_frame(frame2)
+
+
+def page3():
+	nomad_func()
+	for widget in frame3.winfo_children():
+		widget.destroy()
+	tk.Label(frame3, text="Ceci est la page 3").pack(pady=30)
+	btn_to_frame1_from_frame3 = tk.Button(frame3, text="Retourner à la page de calculs", command=lambda: show_frame(frame1))
+	btn_to_frame1_from_frame3.pack()
+	show_frame(frame3)
+
+def programmation_dynamique_func():
+	...
+	
+def nomad_func():
+	...
+	
+
 def open_file_dialog():
     global file_path
     file_path = filedialog.askopenfilename()
@@ -51,76 +56,80 @@ def open_file_dialog():
     
 def fopen():
     print(file_path)
-	
-    
-      
-# Initialisation des entrees
-turbine = tk.Label(text="Cocher les turbines indisponibles")
-elevation = tk.Label(text="Elevation Totale")
-debit = tk.Label(text="Debit Total")
-entry1 = tk.Entry(fg="white", bg="grey", width=50)
-entry2 = tk.Entry(fg="white", bg="grey", width=50)
 
-# Initialisation des entrees
-label_file_path = tk.Label(text="Chemin du fichier:")
-entry_file_path = tk.Entry(fg="black", bg="white", width=50)
 
+
+# Crée l'instance de Tk
+root = tk.Tk()
+root.title("Interface Utilisateur")
+
+# Crée des cadres pour chaque partie de l'application
+frame1 = tk.Frame(root)
+frame2 = tk.Frame(root)
+frame3 = tk.Frame(root)
 
 # Variables pour stocker les valeurs des entrées
 valeurs_turbines = [tk.StringVar(value="160") for _ in range(5)]
 
 # Créer les entrées avec valeurs par défaut
-entrees_turbines = [tk.Entry(window, textvariable=valeur) for valeur in valeurs_turbines]
+entrees_turbines = [tk.Entry(frame1, textvariable=valeur) for valeur in valeurs_turbines]
 
-
-
-# Bouton pour afficher l'état des turbines - utile pour debug
-'''bouton_afficher_etat = tk.Button(window, text="Afficher l'état des turbines", command=afficher_etat_turbines)
-bouton_afficher_etat.pack()
-'''
-
-#Initialisation des boutons
-programmation_dynamique = tk.Button(
+# Initialisation des boutons
+programmation_dynamique_btn = tk.Button(
+	frame1,
     text="Programmation Dynamique",
     width=25,
     height=5,
     bg="blue",
     fg="yellow",
-    command=open_window
+    command=page2
 )
-nomad = tk.Button(
+nomad_btn = tk.Button(
+	frame1,
     text="NOMAD",
     width=25,
     height=5,
     bg="blue",
     fg="yellow",
-    command=open_window2
+    command=page3
 )
 
-# Bouton pour ouvrir la boîte de dialogue de sélection de fichiers
-button_browse = tk.Button(window, text="Parcourir...", command=open_file_dialog)
-OK = tk.Button(window, text="OK", command=fopen)
 
-#Turbines
-# Placer les entrées dans la fenêtre
+# Initialiser les variables qui seront affichees sur la page 1
+elevation = tk.Label(frame1, text="Elevation Totale")
+debit = tk.Label(frame1, text="Debit Total")
+entry1 = tk.Entry(frame1, fg="white", bg="grey", width=50)
+entry2 = tk.Entry(frame1, fg="white", bg="grey", width=50)
+#Selection de fichier
+label_file_path = tk.Label(frame1, text="Chemin du fichier:")
+entry_file_path = tk.Entry(frame1, fg="black", bg="white", width=50)
+# Bouton pour ouvrir la boîte de dialogue de sélection de fichiers
+button_browse = tk.Button(frame1, text="Parcourir...", command=open_file_dialog)
+OK = tk.Button(frame1, text="OK", command=fopen)
+
+# Ce qui sera affiche sur la Frame 1
+tk.Label(frame1, text="Entrer la puissance maximale disponible pour chaque turbine").pack()
+# Champs de texte Turbines
 for entree in entrees_turbines:
     entree.pack()
-
 # Bouton pour afficher les valeurs
-bouton_afficher_valeurs = tk.Button(window, text="Afficher les valeurs", command=afficher_valeurs)
+bouton_afficher_valeurs = tk.Button(frame1, text="Afficher les valeurs", command=afficher_valeurs)
 bouton_afficher_valeurs.pack()
-#Champs de textes
+#Champs de Texte Elevation Debit
 debit.pack()
 entry1.pack()
 elevation.pack()
 entry2.pack()
-#Boutons
-programmation_dynamique.pack()
-nomad.pack()
+programmation_dynamique_btn.pack()
+nomad_btn.pack()
 #Choix de fichier
 label_file_path.pack()
 entry_file_path.pack()
 button_browse.pack()
 OK.pack()
-#Initialisation de la fenetre
-window.mainloop()
+
+
+# Affiche le premier cadre
+show_frame(frame1)
+# Démarre la boucle principale
+root.mainloop()
