@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import filedialog
 import goddamoptimiser as GO
 import pynomadopti  as PNO
 
@@ -6,6 +7,7 @@ window = tk.Tk()
 
 def open_window(): #Programmation Dynamique
     window = tk.Toplevel()
+    
     window.attributes('-topmost', True)
     label = tk.Label(window, text="Voici une nouvelle fenêtre!")
     label2 = tk.Label(window, text=entry1.get())
@@ -29,13 +31,29 @@ def programmation_dynamique():
 def nomad():
     ...
 
-def afficher_etat_turbines():
-    print("Turbine 1:", var_turbine1.get())
-    print("Turbine 2:", var_turbine2.get())
-    print("Turbine 3:", var_turbine3.get())
-    print("Turbine 4:", var_turbine4.get())
-    print("Turbine 5:", var_turbine5.get())
+def afficher_valeurs():
+    valeurs_turbines = [entrees_turbines[i].get() for i in range(5)]
+    print("Valeurs des turbines:", valeurs_turbines)
+    for i, valeur in enumerate(valeurs_turbines):
+        print(f"Valeur turbine {i+1}:", valeur)
+        if int(valeur) >= 160:
+            entrees_turbines[i].delete(0, tk.END)  # Efface la valeur
+            entrees_turbines[i].insert(0, "160")   # Rétablit la valeur par défaut
+    print("Valeurs des turbines:", valeurs_turbines)
     
+   
+def open_file_dialog():
+    global file_path
+    file_path = filedialog.askopenfilename()
+    entry_file_path.delete(0, tk.END)
+    entry_file_path.insert(0, file_path)
+    return file_path
+    
+def fopen():
+    print(file_path)
+	
+    
+      
 # Initialisation des entrees
 turbine = tk.Label(text="Cocher les turbines indisponibles")
 elevation = tk.Label(text="Elevation Totale")
@@ -43,18 +61,16 @@ debit = tk.Label(text="Debit Total")
 entry1 = tk.Entry(fg="white", bg="grey", width=50)
 entry2 = tk.Entry(fg="white", bg="grey", width=50)
 
-# Initialisation des Boutons concernant les turbines à cocher
-var_turbine1 = tk.BooleanVar()
-var_turbine2 = tk.BooleanVar()
-var_turbine3 = tk.BooleanVar()
-var_turbine4 = tk.BooleanVar()
-var_turbine5 = tk.BooleanVar()
+# Initialisation des entrees
+label_file_path = tk.Label(text="Chemin du fichier:")
+entry_file_path = tk.Entry(fg="black", bg="white", width=50)
 
-turbine1 = tk.Checkbutton(window, text="Turbine 1", variable=var_turbine1)
-turbine2 = tk.Checkbutton(window, text="Turbine 2", variable=var_turbine2)
-turbine3 = tk.Checkbutton(window, text="Turbine 3", variable=var_turbine3)
-turbine4 = tk.Checkbutton(window, text="Turbine 4", variable=var_turbine4)
-turbine5 = tk.Checkbutton(window, text="Turbine 5", variable=var_turbine5)
+
+# Variables pour stocker les valeurs des entrées
+valeurs_turbines = [tk.StringVar(value="160") for _ in range(5)]
+
+# Créer les entrées avec valeurs par défaut
+entrees_turbines = [tk.Entry(window, textvariable=valeur) for valeur in valeurs_turbines]
 
 
 
@@ -81,14 +97,18 @@ nomad = tk.Button(
     command=open_window2
 )
 
+# Bouton pour ouvrir la boîte de dialogue de sélection de fichiers
+button_browse = tk.Button(window, text="Parcourir...", command=open_file_dialog)
+OK = tk.Button(window, text="OK", command=fopen)
 
 #Turbines
-turbine.pack()
-turbine1.pack()
-turbine2.pack()
-turbine3.pack()
-turbine4.pack()
-turbine5.pack()
+# Placer les entrées dans la fenêtre
+for entree in entrees_turbines:
+    entree.pack()
+
+# Bouton pour afficher les valeurs
+bouton_afficher_valeurs = tk.Button(window, text="Afficher les valeurs", command=afficher_valeurs)
+bouton_afficher_valeurs.pack()
 #Champs de textes
 debit.pack()
 entry1.pack()
@@ -97,5 +117,10 @@ entry2.pack()
 #Boutons
 programmation_dynamique.pack()
 nomad.pack()
+#Choix de fichier
+label_file_path.pack()
+entry_file_path.pack()
+button_browse.pack()
+OK.pack()
 #Initialisation de la fenetre
 window.mainloop()
