@@ -21,30 +21,34 @@ def afficher_valeurs():
     print("Valeurs des turbines:", valeurs_turbines)
     
     
-def page2():
-	programmation_dynamique_func()
-	for widget in frame2.winfo_children():
-		widget.destroy()
-	tk.Label(frame2, text="Ceci est la page 2").pack(pady=20)
-	btn_to_frame1_from_frame2 = tk.Button(frame2, text="Retourner à la page de calculs", command=lambda: show_frame(frame1))
-	btn_to_frame1_from_frame2.pack()
-	show_frame(frame2)
+def page2(debit, elevation, entrees_turbines):
+    results = programmation_dynamique_func(debit, elevation, entrees_turbines)
+    for widget in frame2.winfo_children():
+        widget.destroy()
+    tk.Label(frame2, text="Debit turbine 1 = "+str(results[1][0])+"\nDebit turbine 2 = "+str(results[1][1])+"\nDebit turbine 3 = "+str(results[1][2])+"\nDebit turbine 4 = "+str(results[1][3])+"\nDebit turbine 5 = "+str(results[1][4])+"\n").pack(pady=30)
+    btn_to_frame1_from_frame2 = tk.Button(frame2, text="Retourner à la page de calculs", command=lambda: show_frame(frame1))
+    btn_to_frame1_from_frame2.pack()
+    show_frame(frame2)
 
 
-def page3():
-	nomad_func()
+def page3(debit, elevation, entrees_turbines):
+	results = nomad_func(debit, elevation, entrees_turbines)
 	for widget in frame3.winfo_children():
 		widget.destroy()
-	tk.Label(frame3, text="Ceci est la page 3").pack(pady=30)
+	tk.Label(frame3, text="Debit turbine 1 = "+str(results[1][0])+"\nDebit turbine 2 = "+str(results[1][1])+"\nDebit turbine 3 = "+str(results[1][2])+"\nDebit turbine 4 = "+str(results[1][3])+"\nDebit turbine 5 = "+str(results[1][4])+"\n").pack(pady=30)
 	btn_to_frame1_from_frame3 = tk.Button(frame3, text="Retourner à la page de calculs", command=lambda: show_frame(frame1))
 	btn_to_frame1_from_frame3.pack()
 	show_frame(frame3)
 
-def programmation_dynamique_func():
-	...
+def programmation_dynamique_func(debit, elevation, entrees_turbines):
+    results = GO.optimize(debit, elevation, entrees_turbines[0], entrees_turbines[1], entrees_turbines[2], entrees_turbines[3], entrees_turbines[4])
+    print(results)
+    return results
 	
-def nomad_func():
-	...
+def nomad_func(debit, elevation, entrees_turbines):
+    results = PNO.optimize(debit, elevation, entrees_turbines[0], entrees_turbines[1], entrees_turbines[2], entrees_turbines[3], entrees_turbines[4])
+    print(results)
+    return results
 	
 
 def open_file_dialog():
@@ -74,6 +78,14 @@ valeurs_turbines = [tk.StringVar(value="160") for _ in range(5)]
 # Créer les entrées avec valeurs par défaut
 entrees_turbines = [tk.Entry(frame1, textvariable=valeur) for valeur in valeurs_turbines]
 
+
+# Initialiser les variables qui seront affichees sur la page 1
+elevation = tk.Label(frame1, text="Elevation Totale")
+debit = tk.Label(frame1, text="Debit Total")
+entryelev = tk.Entry(frame1, fg="white", bg="grey", width=50)
+entrydeb = tk.Entry(frame1, fg="white", bg="grey", width=50)
+
+
 # Initialisation des boutons
 programmation_dynamique_btn = tk.Button(
 	frame1,
@@ -82,7 +94,7 @@ programmation_dynamique_btn = tk.Button(
     height=5,
     bg="blue",
     fg="yellow",
-    command=page2
+    command= lambda: page2(float(entrydeb.get()), float(entryelev.get()), [float(i.get()) for i in entrees_turbines])
 )
 nomad_btn = tk.Button(
 	frame1,
@@ -91,15 +103,8 @@ nomad_btn = tk.Button(
     height=5,
     bg="blue",
     fg="yellow",
-    command=page3
+    command= lambda: page3(float(entrydeb.get()), float(entryelev.get()), [float(i.get()) for i in entrees_turbines])
 )
-
-
-# Initialiser les variables qui seront affichees sur la page 1
-elevation = tk.Label(frame1, text="Elevation Totale")
-debit = tk.Label(frame1, text="Debit Total")
-entry1 = tk.Entry(frame1, fg="white", bg="grey", width=50)
-entry2 = tk.Entry(frame1, fg="white", bg="grey", width=50)
 #Selection de fichier
 label_file_path = tk.Label(frame1, text="Chemin du fichier:")
 entry_file_path = tk.Entry(frame1, fg="black", bg="white", width=50)
@@ -117,9 +122,9 @@ bouton_afficher_valeurs = tk.Button(frame1, text="Afficher les valeurs", command
 bouton_afficher_valeurs.pack()
 #Champs de Texte Elevation Debit
 debit.pack()
-entry1.pack()
+entrydeb.pack()
 elevation.pack()
-entry2.pack()
+entryelev.pack()
 programmation_dynamique_btn.pack()
 nomad_btn.pack()
 #Choix de fichier

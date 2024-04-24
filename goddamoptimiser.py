@@ -49,7 +49,7 @@ def optimize(debit_total_disponible, elevation_amont,t1, t2, t3, t4, t5):
             hauteur_chute_nette = hauteur_chute_brute - (0.5 * 10**(-5)) * debit**2
             production = modele_puissance(debit, hauteur_chute_nette, i)
             production_turbine.append(production)
-        return sum(production_turbine)
+        return sum(production_turbine), [optimized_debits[0], optimized_debits[1], optimized_debits[2], optimized_debits[3], optimized_debits[4]]
 
     else:
         print("L'optimisation n'a pas réussi.")
