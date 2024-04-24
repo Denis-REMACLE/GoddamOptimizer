@@ -61,7 +61,7 @@ def optimize(debit_total, elevation_amont, t1, t2, t3, t4, t5):
     parametres = [
         'DIMENSION 5',
         'BB_OUTPUT_TYPE OBJ',
-        'MAX_BB_EVAL 1000',
+        'MAX_BB_EVAL 100',
         'DISPLAY_STATS BBE OBJ',
         'X0 ( 0 0 0 0 0 )',
         'LOWER_BOUND ( 0 0 0 0 0 )',

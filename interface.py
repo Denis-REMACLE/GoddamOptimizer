@@ -1,7 +1,10 @@
-import tkinter as tk
+import matplotlib.pyplot as plt
 from tkinter import filedialog
 import goddamoptimiser as GO
 import pynomadopti  as PNO
+import tkinter as tk
+import pandas as pd
+import numpy as np
 
 def show_frame(frame):
     frame1.pack_forget()
@@ -9,6 +12,16 @@ def show_frame(frame):
     frame3.pack_forget()
     frame.pack(fill='both', expand=True)
 
+def lire_donnees_depuis_csv(chemin_fichier_csv):
+    df = pd.read_csv(chemin_fichier_csv, delimiter=";")
+
+    colonnes_requises = ['Niv Amont', 'Elav', 'Qtot', 'Qvan',
+                         'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'P1', 'P2', 'P3', 'P4', 'P5']
+    for col in colonnes_requises:
+        if col not in df.columns:
+            raise ValueError(f"La colonne {col} est manquante. Vérifiez le fichier CSV.")
+
+    return df
 
 def afficher_valeurs():
     valeurs_turbines = [entrees_turbines[i].get() for i in range(5)]
@@ -42,12 +55,10 @@ def page3(debit, elevation, entrees_turbines):
 
 def programmation_dynamique_func(debit, elevation, entrees_turbines):
     results = GO.optimize(debit, elevation, entrees_turbines[0], entrees_turbines[1], entrees_turbines[2], entrees_turbines[3], entrees_turbines[4])
-    print(results)
     return results
 	
 def nomad_func(debit, elevation, entrees_turbines):
     results = PNO.optimize(debit, elevation, entrees_turbines[0], entrees_turbines[1], entrees_turbines[2], entrees_turbines[3], entrees_turbines[4])
-    print(results)
     return results
 	
 
@@ -58,10 +69,37 @@ def open_file_dialog():
     entry_file_path.insert(0, file_path)
     return file_path
     
-def fopen():
-    print(file_path)
-
-
+def fopen(file_path):
+    df = lire_donnees_depuis_csv(file_path)
+    elevations, debits = df['Niv Amont'].head(20), df['Qtot'].head(20)
+    power_data_pynomad = []
+    turbines_data_pynomad = []
+    power_data_progdyn = []
+    turbines_data_progdyn = []
+    for i in range(20):
+        ub = []
+        for j in range(5):
+            if df["Q"+str(j+1)][i] == 0:
+                ub.append(0)
+            else:
+                ub.append(160)
+        power_pynomad, turbines_pynomad = nomad_func(debits[i], elevations[i], ub)
+        power_progdyn, turbines_progdyn = programmation_dynamique_func(debits[i], elevations[i], ub)   
+        power_data_pynomad.append(power_pynomad)
+        turbines_data_pynomad.append(turbines_pynomad)
+        power_data_progdyn.append(power_progdyn)
+        turbines_data_progdyn.append(turbines_progdyn)
+    # Tracer le graphique
+    x = [i for i in range(1, len(power_data_progdyn)+1)]
+    plt.figure(figsize=(20, 9))
+    plt.plot(x, power_data_pynomad, label='Pynomad')
+    plt.plot(x, power_data_progdyn, label='Progdyn')
+    plt.xlabel('Ligne du csv')
+    plt.ylabel('Puissance (en unités appropriées)')
+    plt.title('Puissance sur les 20 premières lignes du csv')
+    plt.legend()
+    plt.grid(True)
+    plt.show()  
 
 # Crée l'instance de Tk
 root = tk.Tk()
@@ -110,7 +148,7 @@ label_file_path = tk.Label(frame1, text="Chemin du fichier:")
 entry_file_path = tk.Entry(frame1, fg="black", bg="white", width=50)
 # Bouton pour ouvrir la boîte de dialogue de sélection de fichiers
 button_browse = tk.Button(frame1, text="Parcourir...", command=open_file_dialog)
-OK = tk.Button(frame1, text="OK", command=fopen)
+ok = tk.Button(frame1, text="OK", command=lambda: fopen(entry_file_path.get()))
 
 # Ce qui sera affiche sur la Frame 1
 tk.Label(frame1, text="Entrer la puissance maximale disponible pour chaque turbine").pack()
@@ -131,7 +169,7 @@ nomad_btn.pack()
 label_file_path.pack()
 entry_file_path.pack()
 button_browse.pack()
-OK.pack()
+ok.pack()
 
 
 # Affiche le premier cadre
